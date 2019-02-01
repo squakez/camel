@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.jms.ConnectionFactory;
 
-import org.apache.activemq.camel.component.ActiveMQComponent;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
@@ -38,6 +38,7 @@ import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.activemq.ActiveMQComponent;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Before;
 import org.junit.Ignore;

@@ -16,17 +16,16 @@
  */
 package org.apache.camel.component.jms.issues;
 
-import org.apache.activemq.camel.component.ActiveMQComponent;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.activemq.ActiveMQComponent;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.apache.activemq.camel.component.ActiveMQComponent.activeMQComponent;
 
 /**
  * See MR-170
@@ -52,7 +51,7 @@ public class JmsHammerTest extends CamelTestSupport {
     protected CamelContext createCamelContext() throws Exception {
         CamelContext camelContext = super.createCamelContext();
         ActiveMQComponent activemq =
-            activeMQComponent("vm://localhost?broker.persistent=false&broker.useJmx=false&jms.redeliveryPolicy.maximumRedeliveries=0" 
+        	ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false&broker.useJmx=false&jms.redeliveryPolicy.maximumRedeliveries=0" 
                               + "&jms.redeliveryPolicy.initialRedeliveryDelay=500&jms.useAsyncSend=false&jms.sendTimeout=10000"
                               + "&jms.maxReconnectAttempts=1&jms.timeout=3000");
         camelContext.addComponent("activemq", activemq);

@@ -20,9 +20,9 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 import javax.naming.Context;
 
-import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.activemq.command.ActiveMQTempQueue;
 import org.apache.activemq.command.ActiveMQTempTopic;
+import org.apache.camel.component.activemq.ActiveMQComponent;
 import org.apache.camel.component.jms.JmsConfiguration;
 import org.apache.camel.component.jms.JmsEndpoint;
 import org.apache.camel.component.jms.JmsProviderMetadata;
