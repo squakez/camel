@@ -464,6 +464,16 @@
       </dependency>
       <dependency>
         <groupId>org.apache.camel</groupId>
+        <artifactId>camel-core-minimal</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-core-minimal-starter</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
         <artifactId>camel-core-osgi</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -2306,6 +2316,11 @@
       <dependency>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-spring-boot</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-spring-boot-minimal-starter</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

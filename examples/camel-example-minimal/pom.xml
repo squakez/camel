@@ -43,8 +43,8 @@
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-core-minimal</artifactId>
-      <type>pom</type>
       <version>${project.version}</version>
+      <type>pom</type>
     </dependency>
 
     <!-- we are using the timer component from core -->
