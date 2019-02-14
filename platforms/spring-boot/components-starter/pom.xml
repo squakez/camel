@@ -138,6 +138,7 @@
     <module>camel-consul-starter</module>
     <module>camel-controlbus-starter</module>
     <module>camel-corda-starter</module>
+    <module>camel-core-minimal-starter</module>
     <module>camel-core-starter</module>
     <module>camel-couchbase-starter</module>
     <module>camel-couchdb-starter</module>
@@ -311,8 +312,8 @@
     <module>camel-spark-starter</module>
     <module>camel-splunk-starter</module>
     <module>camel-spring-batch-starter</module>
-    <module>camel-spring-boot-starter</module>
     <module>camel-spring-boot-minimal-starter</module>
+    <module>camel-spring-boot-starter</module>
     <module>camel-spring-cloud-consul-starter</module>
     <module>camel-spring-cloud-netflix-starter</module>
     <module>camel-spring-cloud-starter</module>

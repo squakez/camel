@@ -63,10 +63,19 @@
 
   <dependencies>
 
-    <!-- Camel -->
+    <!-- Camel minimal -->
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-spring-boot-minimal-starter</artifactId>
+    </dependency>
+    <!-- and then only the core components we use -->
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-log-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-stream-starter</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>

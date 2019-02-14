@@ -42,11 +42,11 @@
     <!--START OF GENERATED CODE-->
     <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-core-starter</artifactId>
+      <artifactId>camel-core-minimal-starter</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-spring-boot-starter</artifactId>
+      <artifactId>camel-spring-boot-minimal-starter</artifactId>
     </dependency>
     <!--END OF GENERATED CODE-->
   </dependencies>
