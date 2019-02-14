@@ -835,6 +835,11 @@
         <artifactId>camel-core</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-core-minimal</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- NOTE: auto-generated list of components when building camel catalog -->
       <!-- camel components: START -->

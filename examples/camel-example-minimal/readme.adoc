@@ -1,0 +1,19 @@
+= Camel Example Minimal
+
+This example shows a Camel application with minimal number
+of dependencies. This can be done with the camel-core-minimal
+which does not include all the core components that was shipped
+out of the box in the previous Camel 1.x and 2.x versions.
+
+You can use this to pick and choose which of the core components
+you only need at runtime.
+
+== How to run
+
+You can run this example using
+
+    mvn camel:run
+
+== More information
+
+You can find more information about Apache Camel at the website: http://camel.apache.org/

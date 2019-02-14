@@ -41,6 +41,7 @@
     <module>camel-management-impl</module>
     <module>camel-base</module>
     <module>camel-core</module>
+    <module>camel-core-minimal</module>
   </modules>
 
   <build>
