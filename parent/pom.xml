@@ -432,7 +432,7 @@
         <maven-bundle-plugin-version>4.2.0</maven-bundle-plugin-version>
         <maven-checkstyle-plugin-version>3.0.0</maven-checkstyle-plugin-version>
         <maven-checkstyle-version>7.6.1</maven-checkstyle-version>
-        <maven-owasp-plugin-version>5.1.1</maven-owasp-plugin-version>
+        <maven-owasp-plugin-version>5.2.0</maven-owasp-plugin-version>
         <maven-jar-plugin-version>3.1.2</maven-jar-plugin-version>
         <maven-javadoc-plugin-version>3.0.1</maven-javadoc-plugin-version>
         <maven-jboss-as-maven-plugin-version>7.9.Final</maven-jboss-as-maven-plugin-version>
@@ -656,7 +656,7 @@
         <xmlgraphics-commons-bundle-version>2.3_1</xmlgraphics-commons-bundle-version>
         <xmlgraphics-batik-version>1.11</xmlgraphics-batik-version>
         <xmlresolver-bundle-version>1.2_5</xmlresolver-bundle-version>
-        <xmlsec-version>2.1.3</xmlsec-version>
+        <xmlsec-version>2.1.4</xmlsec-version>
         <xmlunit-version>2.6.2</xmlunit-version>
         <xpp3-bundle-version>1.1.4c_7</xpp3-bundle-version>
         <xpp3-version>1.1.4c</xpp3-version>

@@ -15,7 +15,7 @@ xref:faq/how-do-i-use-spring-property-placeholder-with-camel-xml.adoc[How do
 I use Spring Property Placeholder with Camel XML].
 
 [[UsingPropertyPlaceholder-BridgingSpringandCamelPropertyPlaceholders]]
-===== Bridging Spring and Camel Property Placeholders
+==== Bridging Spring and Camel Property Placeholders
 
 From *Camel 2.10*: Spring's property placeholder can be bridged with
 Camel's. See below for more details.
@@ -27,7 +27,7 @@ following:
 * Lookup of beans in the xref:registry.adoc[Registry]
 * Additional supported in Spring XML (see below in examples)
 * Using Blueprint `PropertyPlaceholder` with Camel
-xref:properties-component.adoc[Properties] component
+xref:components::properties-component.adoc[Properties] component
 * Using `@PropertyInject` to inject a property in a POJO
 * *Camel 2.14.1* Using default value if a property does not exists
 * *Camel 2.14.1* Include out of the box functions, to lookup property
@@ -40,7 +40,7 @@ property component
 ==== Format
 
 The value of a Camel property can be obtained by specifying its key name
-within a property placeholder, using the following format: `{{key}}`
+within a property placeholder, using the following format: `{\{key\}}`
 
 For example:
 ....
@@ -874,7 +874,7 @@ destination=mock:result
 ----
 
 
-[[UsingPropertyPlaceholder-BridgingSpringandCamelPropertyPlaceholders]]
+[[UsingPropertyPlaceholder-BridgingSpringandCamelPropertyPlaceholders-1]]
 ==== Bridging Spring and Camel Property Placeholders
 
 *Available as of Camel 2.10*
@@ -1208,4 +1208,4 @@ pc.addFunction(new MyBeerFunction());
 [[UsingPropertyPlaceholder-SeeAlso]]
 ==== See Also
 
-* xref:properties-component.adoc[Properties] component
+* xref:components::properties-component.adoc[Properties] component
