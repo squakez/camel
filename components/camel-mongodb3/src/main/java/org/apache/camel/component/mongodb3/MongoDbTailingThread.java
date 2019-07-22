@@ -18,7 +18,6 @@ package org.apache.camel.component.mongodb3;
 
 import com.mongodb.CursorType;
 import com.mongodb.MongoCursorNotFoundException;
-import com.mongodb.MongoInterruptedException;
 import com.mongodb.client.MongoCursor;
 import org.apache.camel.Exchange;
 import org.bson.Document;
@@ -132,7 +131,7 @@ class MongoDbTailingThread extends MongoAbstractConsumerThread {
             // this is happening when the consumer is stopped or the mongo interrupted (ie, junit ending test)
             // as we cannot resume, we shutdown the thread gracefully
             log.info("Cursor was closed, likely the consumer was stopped and closed the cursor on purpose.", e);
-            if (cursor!=null) {
+            if (cursor != null) {
                 cursor.close();
             }
             keepRunning = false;
