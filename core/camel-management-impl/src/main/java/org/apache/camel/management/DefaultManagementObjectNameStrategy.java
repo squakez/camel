@@ -197,7 +197,7 @@ public class DefaultManagementObjectNameStrategy implements ManagementObjectName
     public ObjectName getObjectNameForCamelContext(String managementName, String name) throws MalformedObjectNameException {
         StringBuilder buffer = new StringBuilder();
         buffer.append(domainName).append(":");
-        buffer.append(KEY_CONTEXT + "=").append(getContextId(managementName)).append(",");
+        buffer.append(KEY_CONTEXT + "=").append(ObjectName.quote(getContextId(managementName))).append(",");
         buffer.append(KEY_TYPE + "=" + TYPE_CONTEXT + ",");
         buffer.append(KEY_NAME + "=").append(ObjectName.quote(name));
         return createObjectName(buffer);
