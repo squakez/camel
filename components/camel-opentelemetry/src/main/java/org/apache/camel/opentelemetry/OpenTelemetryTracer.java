@@ -153,6 +153,39 @@ public class OpenTelemetryTracer extends org.apache.camel.tracing.Tracer {
     }
 
     @Override
+    protected SpanAdapter create(String spanName, SpanAdapter parent) {
+        OpenTelemetrySpanAdapter oTelSpanWrapper = (OpenTelemetrySpanAdapter) parent;
+        Baggage baggage = null;
+        SpanBuilder builder = tracer.spanBuilder(spanName);
+        if (parent != null) {
+            Span parentSpan = oTelSpanWrapper.getOpenTelemetrySpan();
+            baggage = oTelSpanWrapper.getBaggage();
+            builder = builder.setParent(Context.current().with(parentSpan));
+        } else {
+            builder.setNoParent();
+        }
+        return new OpenTelemetrySpanAdapter(builder.startSpan(), baggage);
+    }
+
+    @Override
+    protected void activate(SpanAdapter span) {
+        OpenTelemetrySpanAdapter oTelSpanWrapper = (OpenTelemetrySpanAdapter) span;
+        oTelSpanWrapper.activate();
+    }
+
+    @Override
+    protected void deactivate(SpanAdapter span) {
+        OpenTelemetrySpanAdapter oTelSpanWrapper = (OpenTelemetrySpanAdapter) span;
+        oTelSpanWrapper.getOpenTelemetrySpan().end();
+    }
+
+    @Override
+    protected void closeSpan(SpanAdapter span) {
+        OpenTelemetrySpanAdapter oTelSpanWrapper = (OpenTelemetrySpanAdapter) span;
+        oTelSpanWrapper.close();
+    }
+
+    @Override
     protected SpanAdapter startExchangeBeginSpan(
             Exchange exchange, SpanDecorator sd, String operationName, org.apache.camel.tracing.SpanKind kind,
             SpanAdapter parent) {

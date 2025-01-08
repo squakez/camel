@@ -23,6 +23,7 @@ import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageBuilder;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
+import io.opentelemetry.context.Scope;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import org.apache.camel.tracing.SpanAdapter;
 import org.apache.camel.tracing.Tag;
@@ -45,6 +46,7 @@ public class OpenTelemetrySpanAdapter implements SpanAdapter {
 
     private Baggage baggage;
     private io.opentelemetry.api.trace.Span span;
+    private Scope scope;
 
     OpenTelemetrySpanAdapter(io.opentelemetry.api.trace.Span span) {
         this.span = span;
@@ -116,6 +118,14 @@ public class OpenTelemetrySpanAdapter implements SpanAdapter {
     @Override
     public AutoCloseable makeCurrent() {
         return span.makeCurrent();
+    }
+
+    public void activate() {
+        this.scope = this.span.makeCurrent();
+    }
+
+    public void close() {
+        this.scope.close();
     }
 
     String getEventNameFromFields(Map<String, ?> fields) {

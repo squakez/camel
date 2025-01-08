@@ -56,13 +56,6 @@ public final class ActiveSpanManager {
      * @param span     The span
      */
     public static void activate(Exchange exchange, SpanAdapter span) {
-        if (exchange.getProperty(ExchangePropertyKey.OTEL_CLOSE_CLIENT_SCOPE, Boolean.FALSE, Boolean.class)) {
-            //Check if we need to close the CLIENT scope created by
-            //DirectProducer in async mode before we create a new INTERNAL scope
-            //for the next DirectConsumer
-            endScope(exchange);
-            exchange.removeProperty(ExchangePropertyKey.OTEL_CLOSE_CLIENT_SCOPE);
-        }
         exchange.setProperty(ExchangePropertyKey.OTEL_ACTIVE_SPAN,
                 new Holder(exchange.getProperty(ExchangePropertyKey.OTEL_ACTIVE_SPAN, Holder.class), span));
         if (Boolean.TRUE.equals(exchange.getContext().isUseMDCLogging())) {
@@ -83,8 +76,6 @@ public final class ActiveSpanManager {
         if (holder != null) {
             Holder parent = holder.getParent();
             exchange.setProperty(ExchangePropertyKey.OTEL_ACTIVE_SPAN, parent);
-
-            holder.closeScope();
             if (Boolean.TRUE.equals(exchange.getContext().isUseMDCLogging())) {
                 if (parent != null) {
                     SpanAdapter span = parent.getSpan();
@@ -108,7 +99,7 @@ public final class ActiveSpanManager {
     public static void endScope(Exchange exchange) {
         Holder holder = exchange.getProperty(ExchangePropertyKey.OTEL_ACTIVE_SPAN, Holder.class);
         if (holder != null) {
-            holder.closeScope();
+            //holder.closeScope();
         }
     }
 
@@ -120,15 +111,10 @@ public final class ActiveSpanManager {
     public static class Holder {
         private final Holder parent;
         private final SpanAdapter span;
-        private final AutoCloseable scope;
 
         Holder(Holder parent, SpanAdapter span) {
             this.parent = parent;
             this.span = span;
-            this.scope = span.makeCurrent();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Tracing: started scope: {}", this.scope);
-            }
         }
 
         public Holder getParent() {
@@ -139,15 +125,5 @@ public final class ActiveSpanManager {
             return span;
         }
 
-        private void closeScope() {
-            try {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Tracing: closing scope: {}", this.scope);
-                }
-                scope.close();
-            } catch (Exception e) {
-                LOG.debug("Failed to close span scope. This exception is ignored.", e);
-            }
-        }
     }
 }

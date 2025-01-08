@@ -87,6 +87,14 @@ public abstract class Tracer extends ServiceSupport implements CamelTracingServi
 
     protected abstract void inject(SpanAdapter span, InjectAdapter adapter);
 
+    protected abstract SpanAdapter create(String spanName, SpanAdapter parent);
+
+    protected abstract void activate(SpanAdapter span);
+
+    protected abstract void deactivate(SpanAdapter span);
+
+    protected abstract void closeSpan(SpanAdapter span);
+
     /**
      * Returns the currently used tracing strategy which is responsible for tracking invoked EIP or beans.
      *
@@ -237,43 +245,39 @@ public abstract class Tracer extends ServiceSupport implements CamelTracingServi
             try {
                 if (event instanceof CamelEvent.ExchangeSendingEvent ese) {
                     SpanDecorator sd = getSpanDecorator(ese.getEndpoint());
-                    if (shouldExclude(sd, ese.getExchange(), ese.getEndpoint())) {
-                        return;
-                    }
-
                     SpanAdapter parent = ActiveSpanManager.getSpan(ese.getExchange());
-                    InjectAdapter injectAdapter = sd.getInjectAdapter(ese.getExchange().getIn().getHeaders(), encoding);
-                    SpanAdapter span = startSendingEventSpan(sd.getOperationName(ese.getExchange(), ese.getEndpoint()),
-                            sd.getInitiatorSpanKind(), parent, ese.getExchange(), injectAdapter);
-                    sd.pre(span, ese.getExchange(), ese.getEndpoint());
-                    inject(span, injectAdapter);
+                    SpanAdapter span = create(sd.getOperationName(ese.getExchange(), ese.getEndpoint()), parent);
                     ActiveSpanManager.activate(ese.getExchange(), span);
+                    activate(span);
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Tracing: start client span: {} with parent {}", span, parent);
                     }
                 } else if (event instanceof CamelEvent.ExchangeSentEvent ese) {
-                    SpanDecorator sd = getSpanDecorator(ese.getEndpoint());
-                    if (shouldExclude(sd, ese.getExchange(), ese.getEndpoint())) {
-                        return;
-                    }
-
                     SpanAdapter span = ActiveSpanManager.getSpan(ese.getExchange());
                     if (span != null) {
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Tracing: stop client span: {}", span);
-                        }
-                        sd.post(span, ese.getExchange(), ese.getEndpoint());
                         ActiveSpanManager.deactivate(ese.getExchange());
-                        finishSpan(span);
+                        deactivate(span);
+                        closeSpan(span);
                     } else {
                         LOG.warn("Tracing: could not find managed span for exchange: {}", ese.getExchange());
                     }
-                } else if (event instanceof CamelEvent.ExchangeAsyncProcessingStartedEvent eap) {
-
-                    // no need to filter scopes here. It's ok to close a scope multiple times and
-                    // implementations check if the scope being disposed is current
-                    // and should not do anything if scopes don't match.
-                    ActiveSpanManager.endScope(eap.getExchange());
+                } else if (event instanceof CamelEvent.ExchangeCreatedEvent ese) {
+                    //SpanAdapter parent = ActiveSpanManager.getSpan(ese.getExchange());
+                    SpanAdapter span = create(ese.getExchange().getExchangeId(), null);
+                    ActiveSpanManager.activate(ese.getExchange(), span);
+                    activate(span);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Tracing: start client span: {} with parent {}", span, null);
+                    }
+                } else if (event instanceof CamelEvent.ExchangeCompletedEvent ese) {
+                    SpanAdapter span = ActiveSpanManager.getSpan(ese.getExchange());
+                    if (span != null) {
+                        ActiveSpanManager.deactivate(ese.getExchange());
+                        deactivate(span);
+                        closeSpan(span);
+                    } else {
+                        LOG.warn("Tracing: could not find managed span for exchange: {}", ese.getExchange());
+                    }
                 }
             } catch (Exception t) {
                 // This exception is ignored
@@ -291,16 +295,11 @@ public abstract class Tracer extends ServiceSupport implements CamelTracingServi
         @Override
         public void onExchangeBegin(Route route, Exchange exchange) {
             try {
-                if (isExcluded(exchange, route.getEndpoint())) {
-                    return;
-                }
                 SpanDecorator sd = getSpanDecorator(route.getEndpoint());
                 SpanAdapter parent = ActiveSpanManager.getSpan(exchange);
-                SpanAdapter span;
-                span = startExchangeBeginSpan(exchange, sd, sd.getOperationName(exchange, route.getEndpoint()),
-                        sd.getReceiverSpanKind(), parent);
-                sd.pre(span, exchange, route.getEndpoint());
+                SpanAdapter span = create(sd.getOperationName(exchange, route.getEndpoint()), parent);
                 ActiveSpanManager.activate(exchange, span);
+                activate(span);
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Tracing: start server span={} with parent {}", span, parent);
                 }
@@ -313,18 +312,11 @@ public abstract class Tracer extends ServiceSupport implements CamelTracingServi
         @Override
         public void onExchangeDone(Route route, Exchange exchange) {
             try {
-                if (isExcluded(exchange, route.getEndpoint())) {
-                    return;
-                }
                 SpanAdapter span = ActiveSpanManager.getSpan(exchange);
                 if (span != null) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Tracing: finish server span={}", span);
-                    }
-                    SpanDecorator sd = getSpanDecorator(route.getEndpoint());
-                    sd.post(span, exchange, route.getEndpoint());
-                    finishSpan(span);
                     ActiveSpanManager.deactivate(exchange);
+                    deactivate(span);
+                    closeSpan(span);
                 } else {
                     LOG.warn("Tracing: could not find managed span for exchange: {}", exchange);
                 }
