@@ -1,0 +1,166 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.camel.micrometer.observability;
+
+import java.util.Map;
+import java.util.function.Predicate;
+
+import io.micrometer.context.ContextAccessor;
+import io.micrometer.context.ContextRegistry;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationHandler;
+import io.micrometer.observation.Observation.Context;
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.observation.transport.ReceiverContext;
+import io.micrometer.tracing.Tracer;
+import org.apache.camel.api.management.ManagedResource;
+import org.apache.camel.spi.Configurer;
+import org.apache.camel.spi.annotations.JdkService;
+import org.apache.camel.support.CamelContextHelper;
+import org.apache.camel.telemetry.Span;
+import org.apache.camel.telemetry.SpanContextPropagationExtractor;
+import org.apache.camel.telemetry.SpanContextPropagationInjector;
+import org.apache.camel.telemetry.SpanLifecycleManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@JdkService("micrometer-observability-tracer")
+@Configurer
+@ManagedResource(description = "MicrometerObservabilityTracer")
+public class MicrometerObservabilityTracer extends org.apache.camel.telemetry.Tracer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MicrometerObservabilityTracer.class);
+
+    private Tracer tracer;
+    private ObservationRegistry observationRegistry;
+
+    @Override
+    protected void initTracer() {
+        if (tracer == null) {
+            tracer = CamelContextHelper.findSingleByType(getCamelContext(), Tracer.class);
+        }
+        if (observationRegistry == null) {
+            observationRegistry = CamelContextHelper.findSingleByType(getCamelContext(), ObservationRegistry.class);
+        }
+        if (observationRegistry == null) {
+            // No Observation Registry is available, so setup Noop
+            observationRegistry = ObservationRegistry.NOOP;
+        }
+        if (tracer == null) {
+            tracer = Tracer.NOOP;
+        }
+
+        this.setSpanLifecycleManager(new MicrometerObservabilitySpanLifecycleManager(observationRegistry));
+    }
+
+    @Override
+    protected void doStart() throws Exception {
+        super.doStart();
+        LOG.info("Micrometer Observability enabled");
+    }
+
+    private class MicrometerObservabilitySpanLifecycleManager implements SpanLifecycleManager {
+
+        private ObservationRegistry observationRegistry;
+
+        private MicrometerObservabilitySpanLifecycleManager(ObservationRegistry obsRegistry) {
+            this.observationRegistry = obsRegistry;
+        }
+
+        @Override
+        public Span create(String spanName, Span parent, SpanContextPropagationExtractor extractor) {
+            Observation.Context context = getContext(extractor);
+            Observation observation = Observation.createNotStarted(spanName, () -> context, observationRegistry);
+            if (parent != null) {
+                MicrometerObservabilitySpanAdapter microObsParentSpan = (MicrometerObservabilitySpanAdapter) parent;
+                observation.parentObservation(microObsParentSpan.getObservation());
+            }
+            return new MicrometerObservabilitySpanAdapter(observation);
+        }
+
+        private Context getContext(SpanContextPropagationExtractor extractor) {
+            ReceiverContext<SpanContextPropagationExtractor> receiverContext
+                    = new ReceiverContext<>((carrier, key) -> {
+                        Object val = extractor.get(key);
+                        return val != null ? val.toString() : null;
+                    });
+            receiverContext.setCarrier(extractor);
+            return receiverContext;
+        }
+
+        @Override
+        public void activate(Span span) {
+            MicrometerObservabilitySpanAdapter microObsSpan = (MicrometerObservabilitySpanAdapter) span;
+            microObsSpan.activate();
+        }
+
+        @Override
+        public void close(Span span) {
+            MicrometerObservabilitySpanAdapter microObsSpan = (MicrometerObservabilitySpanAdapter) span;
+            microObsSpan.close();
+        }
+
+        @Override
+        public void deactivate(Span span) {
+            MicrometerObservabilitySpanAdapter microObsSpan = (MicrometerObservabilitySpanAdapter) span;
+            microObsSpan.deactivate();
+        }
+
+        @Override
+        public void inject(Span span, SpanContextPropagationInjector injector) {
+            observationRegistry.observationConfig().observationHandler(new ObservationHandler.FirstMatchingCompositeObservationHandler());
+            System.out.println("****** inject() " + injector);
+
+            ContextRegistry.getInstance().registerContextAccessor(new ContextAccessor<String, Map<String, String>() {
+
+                @Override
+                public Class<? extends String> readableType() {
+                    return String.class;
+                }
+
+                @Override
+                public void readValues(String sourceContext, Predicate<Object> keyPredicate,
+                        Map<Object, Object> readValues) {
+                    // TODO Auto-generated method stub
+                    throw new UnsupportedOperationException("Unimplemented method 'readValues'");
+                }
+
+                @Override
+                public <T> T readValue(String sourceContext, Object key) {
+                    // TODO Auto-generated method stub
+                    throw new UnsupportedOperationException("Unimplemented method 'readValue'");
+                }
+
+                @Override
+                public Class<? extends Map<String, String>> writeableType() {
+                    return (Class<? extends Map<String, String>>) Map.class;
+                }
+
+                @Override
+                public Map<String, String> writeValues(Map<Object, Object> valuesToWrite,
+                        Map<String, String> targetContext) {
+                    // TODO Auto-generated method stub
+                    throw new UnsupportedOperationException("Unimplemented method 'writeValues'");
+                }
+
+
+            });
+        }
+
+    }
+
+}
