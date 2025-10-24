@@ -29,7 +29,7 @@ on:
       - Jenkinsfile.*
       - NOTICE.txt
 
-permissions: 
+permissions:
   contents: read
 
 jobs:
@@ -61,14 +61,26 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
           cache: 'maven'
+      - name: pre-build
+        shell: bash
+        run: |
+          df -h
       - name: maven build
         run: ./etc/scripts/regen.sh
+      - name: after-build
+        shell: bash
+        run: |
+          df -h
       - name: archive logs
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: build-${{ matrix.java }}.log
           path: build.log
+      - name: after-logs-archive
+        shell: bash
+        run: |
+          df -h
       - name: Fail if there are uncommitted changes
         shell: bash
         run: |
