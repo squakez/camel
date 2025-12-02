@@ -214,7 +214,8 @@ public class Jms2ObjectFactory implements JmsObjectFactory {
             Session session, Destination destination,
             boolean persistent, long ttl)
             throws Exception {
-        MessageProducer messageProducer = session.createProducer(destination);
+        // NOTE: the resource must be closed by the client.
+        MessageProducer messageProducer = session.createProducer(destination); // NOSONAR
         messageProducer.setDeliveryMode(persistent
                 ? DeliveryMode.PERSISTENT
                 : DeliveryMode.NON_PERSISTENT);

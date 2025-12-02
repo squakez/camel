@@ -16,7 +16,6 @@
  */
 package org.apache.camel.component.sjms2;
 
-import org.apache.camel.AsyncEndpoint;
 import org.apache.camel.Category;
 import org.apache.camel.Component;
 import org.apache.camel.component.sjms.SjmsConstants;
@@ -33,7 +32,7 @@ import org.apache.camel.spi.UriParam;
 @UriEndpoint(firstVersion = "2.19.0", scheme = "sjms2", extendsScheme = "sjms", title = "Simple JMS2",
              syntax = "sjms2:destinationType:destinationName", category = { Category.MESSAGING },
              headersClass = SjmsConstants.class)
-public class Sjms2Endpoint extends SjmsEndpoint implements AsyncEndpoint {
+public class Sjms2Endpoint extends SjmsEndpoint {
 
     @UriParam(label = "consumer", description = "Sets the topic subscription id, required for durable or shared topics.")
     private String subscriptionId;
