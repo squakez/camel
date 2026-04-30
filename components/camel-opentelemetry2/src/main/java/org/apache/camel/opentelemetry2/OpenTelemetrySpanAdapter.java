@@ -23,7 +23,6 @@ import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
-import io.opentelemetry.context.Scope;
 import org.apache.camel.telemetry.TagConstants;
 
 public class OpenTelemetrySpanAdapter implements org.apache.camel.telemetry.Span {
@@ -33,8 +32,8 @@ public class OpenTelemetrySpanAdapter implements org.apache.camel.telemetry.Span
 
     private final Span otelSpan;
     private final Baggage baggage;
-    private Scope scope;
-    private Scope baggageScope;
+    // private Scope scope;
+    // private Scope baggageScope;
 
     protected OpenTelemetrySpanAdapter(Span otelSpan, Baggage baggage) {
         this.otelSpan = otelSpan;
@@ -48,8 +47,8 @@ public class OpenTelemetrySpanAdapter implements org.apache.camel.telemetry.Span
     }
 
     protected void makeCurrent() {
-        this.scope = this.otelSpan.makeCurrent();
-        this.baggageScope = this.baggage.makeCurrent();
+        // this.scope = this.otelSpan.makeCurrent();
+        // this.baggageScope = this.baggage.makeCurrent();
     }
 
     protected void end() {
@@ -57,12 +56,12 @@ public class OpenTelemetrySpanAdapter implements org.apache.camel.telemetry.Span
     }
 
     protected void close() {
-        if (baggageScope != null) {
-            this.baggageScope.close();
-        }
-        if (scope != null) {
-            this.scope.close();
-        }
+        // if (baggageScope != null) {
+        //     this.baggageScope.close();
+        // }
+        // if (scope != null) {
+        //     this.scope.close();
+        // }
     }
 
     protected Baggage getBaggage() {

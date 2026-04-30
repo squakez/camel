@@ -29,6 +29,7 @@ import io.opentelemetry.context.propagation.TextMapGetter;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.api.management.ManagedResource;
 import org.apache.camel.spi.Configurer;
+import org.apache.camel.spi.InterceptStrategy;
 import org.apache.camel.spi.annotations.JdkService;
 import org.apache.camel.support.CamelContextHelper;
 import org.apache.camel.telemetry.Span;
@@ -72,6 +73,9 @@ public class OpenTelemetryTracer extends org.apache.camel.telemetry.Tracer {
         }
 
         this.setSpanLifecycleManager(new OpentelemetrySpanLifecycleManager(tracer, contextPropagators));
+
+        InterceptStrategy interceptStrategy = new TraceProcessorsOtelInterceptStrategy();
+        getCamelContext().getCamelContextExtension().addInterceptStrategy(interceptStrategy);
     }
 
     void setTracer(Tracer tracer) {
